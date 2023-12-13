@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventory_m_s.GoodsController">
+   <children>
+      <Pane prefHeight="62.0" prefWidth="600.0" style="-fx-background-color: #333;">
+         <children>
+            <Text fx:id="logo_email" fill="#eee1e1" layoutX="465.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="email">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Button layoutX="14.0" layoutY="17.0" mnemonicParsing="false" onAction="#onLogOut" text="logout" />
+         </children>
+      </Pane>
+      <Pane prefHeight="47.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
+         <children>
+            <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onAllGoods" text="клик!" />
+            <Text layoutX="244.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="все товары" />
+         </children>
+      </Pane>
+      <Pane layoutX="10.0" layoutY="72.0" prefHeight="30.0" prefWidth="600.0" />
+      <Pane layoutX="10.0" layoutY="119.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
+         <children>
+            <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onAddType" text="клик!" />
+            <Text layoutX="240.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="добавить тип" />
+         </children>
+      </Pane>
+      <Pane layoutX="10.0" layoutY="157.0" prefHeight="30.0" prefWidth="600.0" />
+      <Pane layoutX="10.0" layoutY="195.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
+         <children>
+            <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onAddGoods" text="клик!" />
+            <Text layoutX="238.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="добавить товар" />
+         </children>
+      </Pane>
+      <Pane layoutX="10.0" layoutY="233.0" prefHeight="30.0" prefWidth="600.0" />
+      <Pane layoutX="10.0" layoutY="271.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
+         <children>
+            <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDeleteGoods" text="клик!" />
+            <Text layoutX="238.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="удалить товар" />
+         </children>
+      </Pane>
+      <Pane layoutX="10.0" layoutY="309.0" prefHeight="30.0" prefWidth="600.0" />
+      <Pane layoutX="10.0" layoutY="262.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
+         <children>
+            <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onYet" text="клик!" />
+            <Text layoutX="262.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="еще" />
+         </children>
+      </Pane>
+   </children>
+</VBox>
