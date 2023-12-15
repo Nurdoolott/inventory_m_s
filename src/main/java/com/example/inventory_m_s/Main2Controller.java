@@ -23,31 +23,17 @@ public class Main2Controller {
     private Connection conn;
 
     @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
     private Text logo_email;
 
     @FXML
     private ComboBox<String> comboBox;
+
 
     @FXML
     void onReturn(ActionEvent event) {
         loadPageMain("main-view.fxml", true);
     }
 
-    @FXML
-    void onAddType(ActionEvent event) {
-        loadPage("add-type-view.fxml", true);
-    }
-
-    @FXML
-    void onAllGoods(ActionEvent event) {
-        loadPageAllGoods("all-goods-view.fxml");
-    }
     @FXML
     void onUpdateGoods(ActionEvent event) {
         loadPageChange( "change-goods-view.fxml", true);
@@ -59,19 +45,10 @@ public class Main2Controller {
         loadPageMain2("main2-view.fxml", true);
     }
 
-    @FXML
-    void onDeleteGoods(ActionEvent event) {
-        loadPageDelete("delete-view.fxml");
-    }
 
     @FXML
     void onLogOut(ActionEvent event) {
         loadPage("login-view.fxml", false);
-    }
-
-    @FXML
-    void onYet(ActionEvent event) {
-
     }
 
     public void setLogo_email(String text){
@@ -191,69 +168,6 @@ public class Main2Controller {
         }
     }
 
-    public void loadPageAddGoods(String page){
-        try {
-            // Загрузка нового FXML файла
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
-            Parent root = loader.load();
-
-            AddGoodsController addTypeController = loader.getController();
-            addTypeController.setLogo_email(logo_email.getText());
-            // Создание новой сцены
-            Scene scene = new Scene(root);
-
-            // Получение текущего Stage (окна) из любого элемента управления в вашем новом FXML
-            Stage stage = (Stage) logo_email.getScene().getWindow();
-
-            // Установка новой сцены в Stage
-            stage.setScene(scene);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public void loadPageAllGoods(String page){
-        try {
-            // Загрузка нового FXML файла
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
-            Parent root = loader.load();
-
-            AllGoodsController addTypeController = loader.getController();
-            addTypeController.setLogo_email(logo_email.getText());
-            // Создание новой сцены
-            Scene scene = new Scene(root);
-
-            // Получение текущего Stage (окна) из любого элемента управления в вашем новом FXML
-            Stage stage = (Stage) logo_email.getScene().getWindow();
-
-            // Установка новой сцены в Stage
-            stage.setScene(scene);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public void loadPageDelete(String page){
-        try {
-            // Загрузка нового FXML файла
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
-            Parent root = loader.load();
-
-            DeleteController addTypeController = loader.getController();
-            addTypeController.setLogo_email(logo_email.getText());
-            // Создание новой сцены
-            Scene scene = new Scene(root);
-
-            // Получение текущего Stage (окна) из любого элемента управления в вашем новом FXML
-            Stage stage = (Stage) logo_email.getScene().getWindow();
-
-            // Установка новой сцены в Stage
-            stage.setScene(scene);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 }

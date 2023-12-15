@@ -174,14 +174,24 @@ public class ChangeController {
     public void loadPageUpdate(Goods goods) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("update-view.fxml"));
+            System.out.println("get1");
+            System.out.println("get1.5");
+
+
             Parent root = loader.load();
 
-            UpdateController goodsController = loader.getController();
-            goodsController.setLogo_email(logo_email.getText());
-            goodsController.setGoods(goods);
+
 
 
             Scene scene = new Scene(root);
+            UpdateController updateController = loader.getController();
+
+            System.out.println("get2");
+            System.out.println("the prize: "+goods.getPrize());
+            updateController.setGoods(goods);
+
+            updateController.setLogo_email(logo_email.getText());
+
             Stage stage = (Stage) logo_email.getScene().getWindow();
             stage.setScene(scene);
 

@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class AddGoodsController {
@@ -65,7 +66,7 @@ public class AddGoodsController {
 
         Goods goods = new Goods();
         goods.setType(type);
-        goods.setDate(date.getText());
+        goods.setDate(LocalDateTime.now().toString());
         goods.setName(name.getText());
         goods.setPrize(Integer.parseInt(prize.getText()));
         goods.setDescription(description.getText());

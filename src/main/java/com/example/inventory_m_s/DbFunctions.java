@@ -120,19 +120,7 @@ public class DbFunctions {
         }
     }
 
-    public void insert_users_row(Connection conn,String surname, String lastname,
-                                 String email, String password, String phone, String address){
-        Statement statement;
-        try {
-            String query=String.format("insert into users (surname, lastname, email, password, phone, address)" +
-                    " values('%s','%s','%s','%s','%s','%s');",surname,lastname, email, password, phone, address);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
+
     public List<Goods> selectGoods(Connection conn) {
         Statement statement;
         List<Goods> goodsList = new ArrayList<>();
@@ -198,24 +186,7 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
-    public void read_data(Connection conn, String table_name){
-        Statement statement;
-        ResultSet rs=null;
-        try {
-            String query=String.format("select * from %s",table_name);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while(rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("Address")+" ");
-            }
 
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
     public int read_data_type(Connection conn, String table_name){
         Statement statement;
         ResultSet rs=null;
@@ -289,52 +260,54 @@ public class DbFunctions {
         }
         return user;
     }
-    public void user_search_by_email(Connection conn,String email){
+
+    public List<Goods> searchGoods(Connection conn, String table_name, String searchString) {
         Statement statement;
-        ResultSet rs=null;
+        ResultSet rs = null;
+        List<Goods> result = new ArrayList<>();
+        System.out.println("the table name: "+table_name);
+
         try {
-            String query=String.format("select * from users where email= %s",email);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while (rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("address"));
+            // Build the SQL query based on the search criteria
+            String query = String.format("SELECT * FROM %s WHERE " +
+                            "id::text LIKE '%%%s%%' OR " +
+                            "description LIKE '%%%s%%' OR " +
+                            "type LIKE '%%%s%%' OR " +
+                            "size::text LIKE '%%%s%%' OR " +
+                            "name LIKE '%%%s%%' OR " +
+                            "date LIKE '%%%s%%' OR " +
+                            "prize::text LIKE '%%%s%%'",
+                    table_name,
+                    searchString, searchString, searchString,
+                    searchString, searchString, searchString, searchString);
 
+            statement = conn.createStatement();
+            rs = statement.executeQuery(query);
+            int i = 0;
+            System.out.println("start while: ");
+
+            // Iterate over the result set and populate the list
+            while (rs.next()) {
+                i++;
+                System.out.println("the i: "+i);
+                Goods foundGoods = new Goods();
+                foundGoods.setId(rs.getLong("id"));
+                foundGoods.setDescription(rs.getString("description"));
+                foundGoods.setType(rs.getString("type"));
+                foundGoods.setSize(rs.getInt("size"));
+                foundGoods.setName(rs.getString("name"));
+                foundGoods.setDate(rs.getString("date"));
+                foundGoods.setPrize(rs.getInt("prize"));
+
+                result.add(foundGoods);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
-    }
-    public void search_by_id(Connection conn, String table_name,int id){
-        Statement statement;
-        ResultSet rs=null;
-        try {
-            String query=String.format("select * from %s where empid= %s",table_name,id);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while (rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("address"));
 
-            }
-        }catch (Exception e){
-            System.out.println(e);
-        }
+        return result;
     }
 
-    public void delete_row_by_name(Connection conn,String table_name, String name){
-        Statement statement;
-        try{
-            String query=String.format("delete from %s where name='%s'",table_name,name);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Data Deleted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
     public void delete_type_by_type_name(Connection conn,String table_name, String name){
         Statement statement;
         try{
@@ -395,6 +368,83 @@ public class DbFunctions {
             statement=conn.createStatement();
             statement.executeUpdate(query);
             System.out.println("Table Deleted");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void delete_row_by_name(Connection conn,String table_name, String name){
+        Statement statement;
+        try{
+            String query=String.format("delete from %s where name='%s'",table_name,name);
+            statement=conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Data Deleted");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    public void search_by_id(Connection conn, String table_name,int id){
+        Statement statement;
+        ResultSet rs=null;
+        try {
+            String query=String.format("select * from %s where empid= %s",table_name,id);
+            statement=conn.createStatement();
+            rs=statement.executeQuery(query);
+            while (rs.next()){
+                System.out.print(rs.getString("empid")+" ");
+                System.out.print(rs.getString("name")+" ");
+                System.out.println(rs.getString("address"));
+
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    public void user_search_by_email(Connection conn,String email){
+        Statement statement;
+        ResultSet rs=null;
+        try {
+            String query=String.format("select * from users where email= %s",email);
+            statement=conn.createStatement();
+            rs=statement.executeQuery(query);
+            while (rs.next()){
+                System.out.print(rs.getString("empid")+" ");
+                System.out.print(rs.getString("name")+" ");
+                System.out.println(rs.getString("address"));
+
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    public void read_data(Connection conn, String table_name){
+        Statement statement;
+        ResultSet rs=null;
+        try {
+            String query=String.format("select * from %s",table_name);
+            statement=conn.createStatement();
+            rs=statement.executeQuery(query);
+            while(rs.next()){
+                System.out.print(rs.getString("empid")+" ");
+                System.out.print(rs.getString("name")+" ");
+                System.out.println(rs.getString("Address")+" ");
+            }
+
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    public void insert_users_row(Connection conn,String surname, String lastname,
+                                 String email, String password, String phone, String address){
+        Statement statement;
+        try {
+            String query=String.format("insert into users (surname, lastname, email, password, phone, address)" +
+                    " values('%s','%s','%s','%s','%s','%s');",surname,lastname, email, password, phone, address);
+            statement=conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Row Inserted");
         }catch (Exception e){
             System.out.println(e);
         }

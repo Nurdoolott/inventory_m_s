@@ -15,13 +15,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UpdateController {
 
     private Goods goods;
-    public void setGoods(Goods goods){
-        this.goods=goods;
+    public void setGoods(Goods good){
+        this.goods=good;
+        prize.setText(String.valueOf(goods.getPrize()));
+        name.setText(goods.getName());
+        description.setText(goods.getDescription());
+        date.setText(LocalDateTime.now().toString());
+        variableComboBox.setValue(goods.getType());
     }
     private DbFunctions dbFunctions;
     private Connection conn;
@@ -90,11 +96,11 @@ public class UpdateController {
 
         variableComboBox.getItems().addAll(types);
         variableComboBox.setValue("Types");
-        prize.setText(String.valueOf(goods.getPrize()));
-        name.setText(goods.getName());
-        description.setText(goods.getDescription());
-        date.setText(goods.getDate());
-        variableComboBox.setValue(goods.getType());
+//        prize.setText(String.valueOf(goods.getPrize()));
+//        name.setText(goods.getName());
+//        description.setText(goods.getDescription());
+//        date.setText(goods.getDate());
+//        variableComboBox.setValue(goods.getType());
     }
 
 

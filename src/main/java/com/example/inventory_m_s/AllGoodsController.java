@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -25,6 +26,34 @@ public class AllGoodsController {
 
     @FXML
     private Text logo_email;
+
+    @FXML
+    private TextField searchText;
+
+    @FXML
+    void onSearch(ActionEvent event) {
+        String search = searchText.getText();
+        if(search.isEmpty()){
+            all_goods_table.getItems().clear();
+
+            load();
+            loadGoods(conn);
+            return;
+        }
+        System.out.println("Search Query: " + search);
+
+        // Clear the existing items in the table
+        all_goods_table.getItems().clear();
+
+        // Perform the search and update the table with the result
+        List<Goods> searchResult = dbFunctions.searchGoods(conn, "goods", search);
+        if (searchResult != null && !searchResult.isEmpty()) {
+            all_goods_table.getItems().addAll(searchResult);
+        } else {
+            System.out.println("No matching results found.");
+        }
+
+    }
 
     public void setLogo_email(String email){
         logo_email.setText(email);
@@ -65,15 +94,18 @@ public class AllGoodsController {
         dbFunctions=new DbFunctions();
         conn=dbFunctions.connect_to_db("testdb","postgres","1234");
 
+        load();
+
+        // Load and display goods data
+        loadGoods(conn);
+    }
+    public void load(){
         id.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         description.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         type.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
         size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
         name.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         date.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-
-        // Load and display goods data
-        loadGoods(conn);
     }
 
     private void loadGoods(Connection conn) {

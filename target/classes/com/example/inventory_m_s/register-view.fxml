@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.inventory_m_s.RegisterController">
+    <children>
+        <Pane prefHeight="84.0" prefWidth="600.0" style="-fx-background-color: #333;">
+            <children>
+                <Button fx:id="login" layoutX="509.0" layoutY="29.0" mnemonicParsing="false" onAction="#onLogin" text="login" />
+                <Text fill="#c9bfbf" layoutX="20.0" layoutY="48.0" strokeType="OUTSIDE" strokeWidth="0.0" text="NurDoolot">
+                    <font>
+                        <Font size="19.0" />
+                    </font>
+                </Text>
+            </children>
+        </Pane>
+        <Pane prefHeight="188.0" prefWidth="600.0">
+            <children>
+                <TextField fx:id="email" layoutX="188.0" layoutY="82.0" promptText="email" />
+                <Text layoutX="73.0" layoutY="99.0" strokeType="OUTSIDE" strokeWidth="0.0" text="email" />
+                <Text layoutX="75.0" layoutY="155.0" strokeType="OUTSIDE" strokeWidth="0.0" text="password" />
+                <PasswordField fx:id="password" layoutX="188.0" layoutY="138.0" promptText="password" />
+                <Text layoutX="224.0" layoutY="37.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Register please" />
+            </children>
+        </Pane>
+        <Pane prefHeight="200.0" prefWidth="200.0">
+            <children>
+                <Button fx:id="register" layoutX="385.0" layoutY="33.0" mnemonicParsing="false" onAction="#onRegister" prefHeight="26.0" prefWidth="101.0" text="register" />
+                <Text fx:id="error_message" layoutX="201.0" layoutY="72.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            </children>
+        </Pane>
+    </children>
+</VBox>
