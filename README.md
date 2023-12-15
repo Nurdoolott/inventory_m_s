@@ -1,0 +1,10 @@
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 11 14" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/94262083-9b8f-4193-85b0-ca22b217e737">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 11 28" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/b77c5456-c6e1-40e3-b5b1-4352b2173616">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 11 38" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/5d307ee5-83ce-44c4-b9b5-f423aa8f352c">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 11 47" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/4d9ea852-162f-4a64-b90a-0e230036bbd4">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 11 57" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/2df25b2f-e7a1-4c2c-9e2d-f7e2285322a8">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 12 04" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/3c016b59-ed59-4e02-ba5c-0ee41fda3463">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 12 12" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/fd52774e-2beb-4004-b095-3ca1c39679f7">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 12 19" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/43b547ba-5356-4cef-bd58-336741f45b7c">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 12 25" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/b885e328-c523-4444-b562-de26b0c23f55">
+<img width="1680" alt="Screen Shot 2023-12-15 at 10 12 32" src="https://github.com/Nurdoolott/inventory_m_s/assets/120164310/ed41f033-44be-4dd9-ad85-4e37a1dde25a">
