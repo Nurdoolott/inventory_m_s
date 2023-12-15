@@ -41,18 +41,6 @@
             </children>
         </Pane>
         <Pane layoutX="10.0" layoutY="233.0" prefHeight="30.0" prefWidth="600.0" />
-        <Pane layoutX="10.0" layoutY="271.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
-            <children>
-                <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" text="клик!" />
-                <Text layoutX="238.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="поиск товара" />
-            </children>
-        </Pane>
         <Pane layoutX="10.0" layoutY="309.0" prefHeight="30.0" prefWidth="600.0" />
-        <Pane layoutX="10.0" layoutY="262.0" prefHeight="38.0" prefWidth="600.0" style="-fx-background-color: #eeeee4;">
-            <children>
-                <Button layoutX="532.0" layoutY="11.0" mnemonicParsing="false" onAction="#onYet" text="клик!" />
-                <Text layoutX="262.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="еще" />
-            </children>
-        </Pane>
     </children>
 </VBox>

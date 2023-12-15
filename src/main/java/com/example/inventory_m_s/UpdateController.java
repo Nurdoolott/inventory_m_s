@@ -90,7 +90,7 @@ public class UpdateController {
     @FXML
     void initialize() {
         dbFunctions=new DbFunctions();
-        conn=dbFunctions.connect_to_db("testdb","postgres","1234");
+        conn=dbFunctions.connect_to_db("testdb","postgres","123456");
 
         List<String> types = dbFunctions.read_data_types(conn, "types");
 

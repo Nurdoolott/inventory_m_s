@@ -40,7 +40,7 @@ public class AddTypeController {
     @FXML
     void onTypeAdding(ActionEvent event) {
         dbFunctions=new DbFunctions();
-        conn=dbFunctions.connect_to_db("testdb","postgres","1234");
+        conn=dbFunctions.connect_to_db("testdb","postgres","123456");
         if (!typeInput.getText().isEmpty())
             dbFunctions.insert_into_types(conn, typeInput.getText());
 

@@ -67,7 +67,7 @@ public class GoodsController {
     @FXML
     void initialize() {
         dbFunctions=new DbFunctions();
-        conn=dbFunctions.connect_to_db("testdb","postgres","1234");
+        conn=dbFunctions.connect_to_db("testdb","postgres","123456");
         dbFunctions.createTableGoods(conn, "goods");
         dbFunctions.createTableType(conn, "types");
         if(dbFunctions.read_data_type(conn, "types") == 0){

@@ -43,7 +43,7 @@ public class Authenticate {
     @FXML
     void initialize() {
         dbFunctions=new DbFunctions();
-        conn=dbFunctions.connect_to_db("testdb","postgres","1234");
+        conn=dbFunctions.connect_to_db("testdb","postgres","123456");
 
         dbFunctions.createTableUser(conn, "users");
        // dbFunctions.insert_users_row(conn,"surname", "lastname", "email", "password", "phone", "address");
