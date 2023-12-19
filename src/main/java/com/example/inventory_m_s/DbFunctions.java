@@ -2,10 +2,12 @@ package com.example.inventory_m_s;
 
 import com.example.inventory_m_s.entities.Goods;
 import com.example.inventory_m_s.entities.User;
+import com.example.inventory_m_s.enums.Role;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DbFunctions {
     public Connection connect_to_db(String dbname,String user,String pass){
@@ -35,6 +37,7 @@ public class DbFunctions {
                 String query = "CREATE TABLE " + table_name + " ("
                         + "id SERIAL PRIMARY KEY, "
                         + "surname VARCHAR(100), "
+                        + "role VARCHAR(20), "
                         + "lastname VARCHAR(100), "
                         + "email VARCHAR(255), "
                         + "password VARCHAR(255), "
@@ -86,6 +89,7 @@ public class DbFunctions {
                 String query = "CREATE TABLE " + table_name + " ("
                         + "id SERIAL PRIMARY KEY, "
                         + "type VARCHAR(255), "
+                        + "status VARCHAR(255), "
                         + "size INT, "
                         + "prize INT, "
                         + "name VARCHAR(255), "
@@ -106,17 +110,43 @@ public class DbFunctions {
         }
     }
 
-    public void insert_users_register(Connection conn,
-                                 String email, String password){
-        Statement statement;
+    public Long insert_users_register(Connection conn, User user) {
+        PreparedStatement preparedStatement = null;
+        ResultSet generatedKeys = null;
+
         try {
-            String query=String.format("insert into users (email, password)" +
-                    " values('%s','%s');",email, password);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
-        }catch (Exception e){
-            System.out.println(e);
+            String query = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
+            preparedStatement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getRole().toString());
+
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new RuntimeException("Inserting user failed, no rows affected.");
+            }
+
+            generatedKeys = preparedStatement.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            } else {
+                throw new RuntimeException("Inserting user failed, no ID obtained.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (Exception e) {
+                // обработка исключений в случае ошибок закрытия ресурсов
+            }
         }
     }
 
@@ -126,11 +156,51 @@ public class DbFunctions {
         List<Goods> goodsList = new ArrayList<>();
 
         try {
-            String query = "select * from goods;";
+            String query = "select * from goods where status = 'active';";
             statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
+                Goods goods = new Goods();
+                goods.setId(resultSet.getLong("id"));
+                goods.setType(resultSet.getString("type"));
+                goods.setSize(Integer.parseInt(resultSet.getString("size")));
+                goods.setName(resultSet.getString("name"));
+                goods.setDescription(resultSet.getString("description"));
+                goods.setDate(resultSet.getString("date"));
+                goods.setPrize(resultSet.getInt("prize"));
+
+                goodsList.add(goods);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return goodsList;
+    }
+    public List<Goods> selectGoodsWithIds(Connection conn, List<Integer> goodsIds) {
+        Statement statement;
+        List<Goods> goodsList = new ArrayList<>();
+
+        try {
+            // Convert the list of goods IDs to a comma-separated string
+            String idsString = goodsIds.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            System.out.println("ther idsString: "+idsString);
+
+            // Build the SQL query with a WHERE clause to filter by goods IDs
+            String query = "SELECT * FROM goods WHERE id IN (" + idsString + ") ";
+            System.out.println("Query: " + query);
+
+
+            statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                System.out.println("its while working");
                 Goods goods = new Goods();
                 goods.setId(resultSet.getLong("id"));
                 goods.setType(resultSet.getString("type"));
@@ -149,11 +219,48 @@ public class DbFunctions {
 
         return goodsList;
     }
+
+    public List<Integer> selectUsersGoods(Connection conn, Long userId) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Integer> goodsList = new ArrayList<>();
+
+        try {
+            String query = "SELECT * FROM usersgoods WHERE userId = ?";
+            preparedStatement = conn.prepareStatement(query);
+            preparedStatement.setLong(1, userId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+
+                goodsList.add(resultSet.getInt("goodsId"));
+            }
+        } catch (SQLException e) {
+            // Обработка исключений
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                // Обработка исключений в случае ошибок закрытия ресурсов
+                e.printStackTrace();
+            }
+        }
+
+        return goodsList;
+    }
     public void goods_insert(Connection conn, Goods goods){
         Statement statement;
         try {
-            String query=String.format("insert into goods (type, name, description, date, prize)" +
-                    " values('%s','%s','%s','%s','%s');",goods.getType(),goods.getName(), goods.getDescription(), goods.getDate(), goods.getPrize());
+            String query=String.format("insert into goods (type, name, description, date, prize, status, size)" +
+                    " values('%s','%s','%s','%s','%s', '%s', '%s');",goods.getType(),goods.getName(), goods.getDescription(), goods.getDate(), goods.getPrize(), goods.getStatus(), goods.getSize());
             statement=conn.createStatement();
             statement.executeUpdate(query);
             System.out.println("Row Inserted");
@@ -253,6 +360,7 @@ public class DbFunctions {
                 user.setLastname(rs.getString("lastname"));
                 user.setAddress(rs.getString("address"));
                 user.setPhoneNumber(rs.getString("phone"));
+                user.setRole(Role.valueOf(rs.getString("role")));
 
             }
         }catch (Exception e){
@@ -449,4 +557,64 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
+
+    public void setGoodsForUser(Connection conn, Long userId, Goods goods) {
+        System.out.println("worked0");
+
+        createTableUsersGoods(conn, "usersgoods");
+        System.out.println("worked1");
+        System.out.println("the goods id:"+goods.getId());
+        System.out.println("the user id:"+userId);
+
+        Statement statement;
+        try {
+            String query = String.format("insert into usersgoods (userId, goodsId)" +
+                    " values('%s','%s');", userId, goods.getId());
+
+            statement=conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Row Inserted");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        System.out.println("worked2");
+
+
+    }
+    public void createTableUsersGoods(Connection conn, String table_name) {
+        System.out.println("the table_name: "+ table_name);
+        Statement statement;
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet resultSet = metaData.getTables(null, null, table_name, null);
+
+            if (!resultSet.next()) {
+                String query = "CREATE TABLE "+ table_name +" (id SERIAL PRIMARY KEY, userId integer,goodsId integer);";
+
+
+                statement = conn.createStatement();
+                statement.executeUpdate(query);
+                System.out.println("Table Created");
+            } else {
+                System.out.println("Table already exists");
+            }
+
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void setGoodStatus(Connection conn, String status, Long goodId) {
+        Statement statement;
+        try {
+            String query = String.format("UPDATE goods SET status = '%s' WHERE id = %d;", status, goodId);
+            statement = conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Status Updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }

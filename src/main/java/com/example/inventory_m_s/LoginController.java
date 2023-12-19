@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import com.example.inventory_m_s.entities.User;
+import com.example.inventory_m_s.enums.Role;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,7 +59,19 @@ public class LoginController {
                 error_message.setText("incorrect password");
             }
             else {
-                loadPage("main-view.fxml", true);
+                if (user.getRole().equals(Role.ADMIN)) {
+                    System.out.println("the user id on login: "+user.getId());
+                    RegisterController.setUserId(user.getId());
+                    loadPage("main-view.fxml", true);
+                }
+                else {
+                    System.out.println("the user id on login: "+user.getId());
+
+                    RegisterController.setUserId(user.getId());
+
+                    loadPageUser("main-user-view.fxml", true);
+
+                }
 
             }
         }
@@ -87,6 +100,29 @@ public class LoginController {
             Parent root = loader.load();
             if (isChecked){
                 GoodsController goodsController = loader.getController();
+                goodsController.setLogo_email(email.getText());
+            }
+
+            // Создание новой сцены
+            Scene scene = new Scene(root);
+
+            // Получение текущего Stage (окна)
+            Stage stage = (Stage) login.getScene().getWindow();
+
+            // Установка новой сцены в Stage
+            stage.setScene(scene);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void loadPageUser(String page, Boolean isChecked){
+        try {
+            // Загрузка нового FXML файла
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
+            Parent root = loader.load();
+            if (isChecked){
+                MainUserController goodsController = loader.getController();
                 goodsController.setLogo_email(email.getText());
             }
 

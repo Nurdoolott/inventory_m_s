@@ -18,7 +18,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
 
-public class DeleteController {
+public class MainUserController {
 
     private DbFunctions dbFunctions;
     private Connection conn;
@@ -57,7 +57,7 @@ public class DeleteController {
 
     @FXML
     void onMain(ActionEvent event) {
-        loadPageMain("main-view.fxml");
+        loadPageMain("busket-view.fxml");
     }
 
     @FXML
@@ -79,20 +79,22 @@ public class DeleteController {
     }
 
     private void loadGoods(Connection conn) {
+
         List<Goods> goodsList = dbFunctions.selectGoods(conn); // Replace with your actual method
         all_goods_table.getItems().addAll(goodsList);
     }
 
     private void initializeDeleteColumn() {
         deleteColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button deleteButton = new Button("Delete");
+            private final Button deleteButton = new Button("купить");
 
             {
                 deleteButton.setOnAction(event -> {
                     Goods goods = getTableView().getItems().get(getIndex());
                     goods.setStatus("disable");
-                    dbFunctions.setGoodStatus(conn, "disable", goods.getId());
-                    deleteGoods(goods);
+                    dbFunctions.setGoodStatus(conn,"disable", goods.getId());
+                    loadPage("main-user-view.fxml");
+                        deleteGoods(goods);
                 });
             }
 
@@ -110,9 +112,10 @@ public class DeleteController {
 
     private void deleteGoods(Goods goods) {
         // Implement your delete logic here
+        dbFunctions.setGoodsForUser(conn, RegisterController.getUserId(), goods);
         System.out.println("Deleting goods with id: " + goods.getId());
-        dbFunctions.delete_row_by_id(conn,"goods", Math.toIntExact(goods.getId()));
-        loadPage("delete-view.fxml");
+       // dbFunctions.delete_row_by_id(conn,"goods", Math.toIntExact(goods.getId()));
+        loadPage("main-user-view.fxml");
     }
     public void deleteGoods(Connection conn, Goods goods) {
         try {
@@ -135,7 +138,7 @@ public class DeleteController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
             Parent root = loader.load();
 
-            GoodsController goodsController = loader.getController();
+            BusketController goodsController = loader.getController();
             goodsController.setLogo_email(logo_email.getText());
 
             Scene scene = new Scene(root);
@@ -166,7 +169,7 @@ public class DeleteController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
             Parent root = loader.load();
 
-            DeleteController goodsController = loader.getController();
+            MainUserController goodsController = loader.getController();
             goodsController.setLogo_email(logo_email.getText());
 
 

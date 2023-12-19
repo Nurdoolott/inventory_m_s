@@ -6,20 +6,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.List;
 
-
-import java.util.List;
-
-public class AllGoodsController {
+public class BusketController {
 
     private DbFunctions dbFunctions;
     private Connection conn;
@@ -28,38 +27,8 @@ public class AllGoodsController {
     private Text logo_email;
 
     @FXML
-    private TextField searchText;
-
-    @FXML
-    void onSearch(ActionEvent event) {
-        String search = searchText.getText();
-        if(search.isEmpty()){
-            all_goods_table.getItems().clear();
-
-            load();
-            loadGoods(conn);
-            return;
-        }
-        System.out.println("Search Query: " + search);
-
-        // Clear the existing items in the table
-        all_goods_table.getItems().clear();
-
-        // Perform the search and update the table with the result
-        List<Goods> searchResult = dbFunctions.searchGoods(conn, "goods", search);
-        if (searchResult != null && !searchResult.isEmpty()) {
-            all_goods_table.getItems().addAll(searchResult);
-        } else {
-            System.out.println("No matching results found.");
-        }
-
-    }
-
-    public void setLogo_email(String email){
-        logo_email.setText(email);
-    }
-    @FXML
     private TableView<Goods> all_goods_table;
+
     @FXML
     private TableColumn<Goods, Long> id;
 
@@ -68,8 +37,6 @@ public class AllGoodsController {
 
     @FXML
     private TableColumn<Goods, String> type;
-    @FXML
-    private TableColumn<Goods, String> prize;
 
     @FXML
     private TableColumn<Goods, Integer> size;
@@ -80,6 +47,7 @@ public class AllGoodsController {
     @FXML
     private TableColumn<Goods, String> date;
 
+
     @FXML
     void onLogOut(ActionEvent event) {
         loadPageLogin("login-view.fxml");
@@ -87,70 +55,69 @@ public class AllGoodsController {
 
     @FXML
     void onMain(ActionEvent event) {
-        loadPageMain("main-view.fxml");
+        loadPageMain("main-user-view.fxml");
     }
-
 
     @FXML
     void initialize() {
-        dbFunctions=new DbFunctions();
-        conn=dbFunctions.connect_to_db("testdb","postgres","123456");
+        dbFunctions = new DbFunctions();
+        conn = dbFunctions.connect_to_db("testdb", "postgres", "123456");
 
-        load();
-
-        // Load and display goods data
-        loadGoods(conn);
-    }
-    public void load(){
         id.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         description.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         type.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
         size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
         name.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         date.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-        prize.setCellValueFactory(cellData -> cellData.getValue().prizeProperty().asObject().asString());
+
+
+        // Load and display goods data
+        loadGoods(conn);
     }
 
     private void loadGoods(Connection conn) {
-        DbFunctions dbFunctions = new DbFunctions();
-        List<Goods> goodsList = dbFunctions.selectGoods(conn); // Replace with your actual method
+        System.out.println("work01");
+        List<Integer> ids = dbFunctions.selectUsersGoods(conn, RegisterController.getUserId());
+        System.out.println("the ids of goods: " + ids.size());
+        //System.out.println("id of good: "+ids.get(0));
+        List<Goods> goodsList = dbFunctions.selectGoodsWithIds(conn,ids );
+        System.out.println("size of list goods: "+goodsList.size());
         all_goods_table.getItems().addAll(goodsList);
     }
-    public void loadPageMain(String page){
+
+
+
+
+
+
+    public void setLogo_email(String email) {
+        logo_email.setText(email);
+    }
+
+    public void loadPageMain(String page) {
         try {
-            // Загрузка нового FXML файла
             FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
             Parent root = loader.load();
 
-            GoodsController goodsController = loader.getController();
+            MainUserController goodsController = loader.getController();
             goodsController.setLogo_email(logo_email.getText());
 
-            // Создание новой сцены
             Scene scene = new Scene(root);
-
-            // Получение текущего Stage (окна) из текущего элемента управления (typeInput)
             Stage stage = (Stage) logo_email.getScene().getWindow();
-
-            // Установка новой сцены в Stage
             stage.setScene(scene);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void loadPageLogin(String page){
+
+    public void loadPageLogin(String page) {
         try {
-            // Загрузка нового FXML файла
             FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
             Parent root = loader.load();
 
-            // Создание новой сцены
             Scene scene = new Scene(root);
-
-            // Получение текущего Stage (окна) из текущего элемента управления (typeInput)
             Stage stage = (Stage) logo_email.getScene().getWindow();
-
-            // Установка новой сцены в Stage
             stage.setScene(scene);
 
         } catch (IOException e) {
@@ -158,4 +125,21 @@ public class AllGoodsController {
         }
     }
 
+    public void loadPage(String page) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(page));
+            Parent root = loader.load();
+
+            DeleteController goodsController = loader.getController();
+            goodsController.setLogo_email(logo_email.getText());
+
+
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logo_email.getScene().getWindow();
+            stage.setScene(scene);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

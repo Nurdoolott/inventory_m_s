@@ -67,9 +67,11 @@ public class AddGoodsController {
         Goods goods = new Goods();
         goods.setType(type);
         goods.setDate(LocalDateTime.now().toString());
+        goods.setSize(Integer.parseInt(date.getText()));
         goods.setName(name.getText());
         goods.setPrize(Integer.parseInt(prize.getText()));
         goods.setDescription(description.getText());
+        goods.setStatus("active");
 
         dbFunctions.goods_insert(conn, goods);
         statusAdding.setText("added successfully!");

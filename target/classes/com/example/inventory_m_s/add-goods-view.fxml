@@ -41,8 +41,8 @@
       </Pane>
       <Pane layoutX="10.0" layoutY="192.0" prefHeight="30.0" prefWidth="600.0">
          <children>
-            <TextField fx:id="date" layoutX="220.0" layoutY="3.0" promptText="date" />
-            <Text layoutX="67.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="дата" />
+            <TextField fx:id="date" layoutX="220.0" layoutY="3.0" promptText="size" />
+            <Text layoutX="67.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="размер" />
             <Button layoutX="467.0" layoutY="-5.0" mnemonicParsing="false" onAction="#onTypeAdding" text="клик!" />
          </children>
       </Pane>

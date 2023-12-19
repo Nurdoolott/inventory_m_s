@@ -91,7 +91,7 @@ public class UpdateController {
     void initialize() {
         dbFunctions=new DbFunctions();
         conn=dbFunctions.connect_to_db("testdb","postgres","123456");
-
+        //вв some changes
         List<String> types = dbFunctions.read_data_types(conn, "types");
 
         variableComboBox.getItems().addAll(types);
@@ -146,7 +146,4 @@ public class UpdateController {
             e.printStackTrace();
         }
     }
-
-
-
 }

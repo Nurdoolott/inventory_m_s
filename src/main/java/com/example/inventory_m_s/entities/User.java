@@ -1,9 +1,20 @@
 package com.example.inventory_m_s.entities;
 
+import com.example.inventory_m_s.enums.Role;
+
 public class User {
     private Long id;
     private String surname;
     private String lastname;
+    private Role role;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
