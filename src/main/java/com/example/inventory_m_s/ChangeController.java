@@ -68,7 +68,7 @@ public class ChangeController {
 
         id.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         description.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
-        type.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
+        type.setCellValueFactory(cellData -> cellData.getValue().typeProperty().asString());
         size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
         name.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         date.setCellValueFactory(cellData -> cellData.getValue().dateProperty());

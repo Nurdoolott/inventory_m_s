@@ -65,7 +65,7 @@ public class AddGoodsController {
         String type = variableComboBox.getValue();
 
         Goods goods = new Goods();
-        goods.setType(type);
+        goods.setType(dbFunctions.selectTypeWithName(conn, type));
         goods.setDate(LocalDateTime.now().toString());
         goods.setSize(Integer.parseInt(date.getText()));
         goods.setName(name.getText());
@@ -73,7 +73,9 @@ public class AddGoodsController {
         goods.setDescription(description.getText());
         goods.setStatus("active");
 
-        dbFunctions.goods_insert(conn, goods);
+        Long goodsId =  dbFunctions.goods_insert(conn, goods);
+        dbFunctions.createGoodsInsertTrigger(conn, RegisterController.getUserId(), goodsId);
+
         statusAdding.setText("added successfully!");
 
     }

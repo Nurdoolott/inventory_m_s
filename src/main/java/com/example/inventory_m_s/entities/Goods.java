@@ -5,7 +5,7 @@ import javafx.beans.property.*;
 public class Goods {
     private final LongProperty id = new SimpleLongProperty();
     private final StringProperty description = new SimpleStringProperty();
-    private final StringProperty type = new SimpleStringProperty();
+    private final IntegerProperty type = new SimpleIntegerProperty();
     private final IntegerProperty size = new SimpleIntegerProperty();
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty date = new SimpleStringProperty();
@@ -49,15 +49,15 @@ public class Goods {
         this.description.set(description);
     }
 
-    public String getType() {
+    public Integer getType() {
         return type.get();
     }
 
-    public StringProperty typeProperty() {
+    public IntegerProperty typeProperty() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type.set(type);
     }
 

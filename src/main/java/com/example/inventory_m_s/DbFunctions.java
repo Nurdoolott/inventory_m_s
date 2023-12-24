@@ -10,22 +10,96 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DbFunctions {
-    public Connection connect_to_db(String dbname,String user,String pass){
-        Connection conn=null;
-        try{
-            Class.forName("org.postgresql.Driver");
-            conn= DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+dbname,user,pass);
-            if(conn!=null){
-                System.out.println("Connection Established");
-            }
-            else{
-                System.out.println("Connection Failed");
-            }
+    public Long goods_insert(Connection conn, Goods goods) {
+        Long generatedId = null;
 
-        }catch (Exception e){
+        try {
+            String query = "INSERT INTO goods (type_id, name, description, date, prize, status, size) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setInt(1, goods.getType());
+                statement.setString(2, goods.getName());
+                statement.setString(3, goods.getDescription());
+                statement.setString(4, goods.getDate());
+                statement.setInt(5, goods.getPrize());
+                statement.setString(6, goods.getStatus());
+                statement.setInt(7, goods.getSize());
+
+                int affectedRows = statement.executeUpdate();
+
+                if (affectedRows > 0) {
+                    try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            generatedId = generatedKeys.getLong(1);
+                            System.out.println("Row Inserted to the table goods with ID: " + generatedId);
+                        }
+                    }
+                } else {
+                    System.out.println("No rows affected.");
+                }
+            }
+        } catch (SQLException e) {
             System.out.println(e);
         }
-        return conn;
+
+        return generatedId;
+    }
+
+    public void createGoodsInsertTrigger(Connection conn, Long userId, Long goodId) {
+        try {
+            String triggerQuery = "CREATE OR REPLACE FUNCTION goods_insert_trigger_function()\n" +
+                    "RETURNS TRIGGER AS $$\n" +
+                    "BEGIN\n" +
+                    "  INSERT INTO history (userid, action, time, goodsid)\n" +
+                    "  VALUES (" + Math.toIntExact(userId) + ", 'add', NOW(), " + Math.toIntExact(goodId) + ");\n" +
+                    "  RETURN NEW;\n" +
+                    "END;\n" +
+                    "$$ LANGUAGE plpgsql;\n" +
+                    "CREATE TRIGGER goods_insert_trigger\n" +
+                    "AFTER INSERT ON goods\n" +
+                    "FOR EACH ROW\n" +
+                    "EXECUTE PROCEDURE goods_insert_trigger_function();";
+
+            try (Statement statement = conn.createStatement()) {
+                System.out.println("w1");
+                statement.executeUpdate(triggerQuery);
+                System.out.println("w2");
+            }
+
+            System.out.println("Trigger Created");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+
+    public void createTableHistory(Connection conn){
+        Statement statement;
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet resultSet = metaData.getTables(null, null, "history", null);
+
+            if (!resultSet.next()) {
+                String query = "CREATE TABLE history ("
+                        + "id SERIAL PRIMARY KEY, "
+                        + "userId INT REFERENCES users(id), "
+                        + "action varchar(100), "
+                        + "time varchar(100), "
+                        + "goodsId INT REFERENCES goods(id)"
+                        + ");";
+                statement = conn.createStatement();
+                statement.executeUpdate(query);
+                System.out.println("Table history Created");
+            } else {
+                System.out.println("Table history already exists");
+            }
+
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
     public void createTableUser(Connection conn, String table_name) {
         Statement statement;
@@ -46,9 +120,9 @@ public class DbFunctions {
                         + ");";
                 statement = conn.createStatement();
                 statement.executeUpdate(query);
-                System.out.println("Table Created");
+                System.out.println("Table users Created");
             } else {
-                System.out.println("Table already exists");
+                System.out.println("Table users already exists");
             }
 
             resultSet.close();
@@ -69,9 +143,9 @@ public class DbFunctions {
                         + ");";
                 statement = conn.createStatement();
                 statement.executeUpdate(query);
-                System.out.println("Table Created");
+                System.out.println("Table types Created");
             } else {
-                System.out.println("Table already exists");
+                System.out.println("Table types already exists");
             }
 
             resultSet.close();
@@ -88,7 +162,7 @@ public class DbFunctions {
             if (!resultSet.next()) {
                 String query = "CREATE TABLE " + table_name + " ("
                         + "id SERIAL PRIMARY KEY, "
-                        + "type VARCHAR(255), "
+                        + "type_id INT REFERENCES types(id), "
                         + "status VARCHAR(255), "
                         + "size INT, "
                         + "prize INT, "
@@ -99,9 +173,9 @@ public class DbFunctions {
 
                 statement = conn.createStatement();
                 statement.executeUpdate(query);
-                System.out.println("Table Created");
+                System.out.println("Table goods Created");
             } else {
-                System.out.println("Table already exists");
+                System.out.println("Table goods already exists");
             }
 
             resultSet.close();
@@ -109,6 +183,32 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
+    public void createTableUsersGoods(Connection conn, String table_name) {
+        Statement statement;
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet resultSet = metaData.getTables(null, null, table_name, null);
+
+            if (!resultSet.next()) {
+                String query = "CREATE TABLE " + table_name + " ("
+                        + "id SERIAL PRIMARY KEY, "
+                        + "userId INT REFERENCES users(id), "
+                        + "goodsId INT REFERENCES goods(id)"
+                        + ");";
+
+                statement = conn.createStatement();
+                statement.executeUpdate(query);
+                System.out.println("Table usersgoods Created");
+            } else {
+                System.out.println("Table usersgoods already exists");
+            }
+
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 
     public Long insert_users_register(Connection conn, User user) {
         PreparedStatement preparedStatement = null;
@@ -163,7 +263,7 @@ public class DbFunctions {
             while (resultSet.next()) {
                 Goods goods = new Goods();
                 goods.setId(resultSet.getLong("id"));
-                goods.setType(resultSet.getString("type"));
+                goods.setType(resultSet.getInt("type_id"));
                 goods.setSize(Integer.parseInt(resultSet.getString("size")));
                 goods.setName(resultSet.getString("name"));
                 goods.setDescription(resultSet.getString("description"));
@@ -193,6 +293,7 @@ public class DbFunctions {
 
             // Build the SQL query with a WHERE clause to filter by goods IDs
             String query = "SELECT * FROM goods WHERE id IN (" + idsString + ") ";
+
             System.out.println("Query: " + query);
 
 
@@ -203,7 +304,7 @@ public class DbFunctions {
                 System.out.println("its while working");
                 Goods goods = new Goods();
                 goods.setId(resultSet.getLong("id"));
-                goods.setType(resultSet.getString("type"));
+                goods.setType(resultSet.getInt("type_id"));
                 goods.setName(resultSet.getString("name"));
                 goods.setDescription(resultSet.getString("description"));
                 goods.setDate(resultSet.getString("date"));
@@ -256,18 +357,7 @@ public class DbFunctions {
 
         return goodsList;
     }
-    public void goods_insert(Connection conn, Goods goods){
-        Statement statement;
-        try {
-            String query=String.format("insert into goods (type, name, description, date, prize, status, size)" +
-                    " values('%s','%s','%s','%s','%s', '%s', '%s');",goods.getType(),goods.getName(), goods.getDescription(), goods.getDate(), goods.getPrize(), goods.getStatus(), goods.getSize());
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
+
 
     public void insert_into_types(Connection conn, String type){
         Statement statement;
@@ -281,19 +371,6 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
-
-    public void insert_row(Connection conn,String table_name,String name, String address){
-        Statement statement;
-        try {
-            String query=String.format("insert into %s(name,address) values('%s','%s');",table_name,name,address);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-
     public int read_data_type(Connection conn, String table_name){
         Statement statement;
         ResultSet rs=null;
@@ -333,17 +410,6 @@ public class DbFunctions {
 
     }
 
-    public void update_name(Connection conn,String table_name, String old_name,String new_name){
-        Statement statement;
-        try {
-            String query=String.format("update %s set name='%s' where name='%s'",table_name,new_name,old_name);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Data Updated");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
     public User users_search_by_email_and_password(Connection conn, String table_name, String email) throws SQLException {
         Statement statement;
         ResultSet rs=null;
@@ -401,7 +467,7 @@ public class DbFunctions {
                 Goods foundGoods = new Goods();
                 foundGoods.setId(rs.getLong("id"));
                 foundGoods.setDescription(rs.getString("description"));
-                foundGoods.setType(rs.getString("type"));
+                foundGoods.setType(selectTypeWithName(conn, rs.getString("type")));
                 foundGoods.setSize(rs.getInt("size"));
                 foundGoods.setName(rs.getString("name"));
                 foundGoods.setDate(rs.getString("date"));
@@ -442,10 +508,10 @@ public class DbFunctions {
         PreparedStatement preparedStatement = null;
 
         try {
-            String query = "UPDATE goods SET type=?, name=?, description=?, date=?, prize=? WHERE id=?";
+            String query = "UPDATE goods SET type_id=?, name=?, description=?, date=?, prize=? WHERE id=?";
             preparedStatement = conn.prepareStatement(query);
 
-            preparedStatement.setString(1, updatedGoods.getType());
+            preparedStatement.setInt(1, updatedGoods.getType());
             preparedStatement.setString(2, updatedGoods.getName());
             preparedStatement.setString(3, updatedGoods.getDescription());
             preparedStatement.setString(4, updatedGoods.getDate());
@@ -465,96 +531,6 @@ public class DbFunctions {
                     System.out.println(e);
                 }
             }
-        }
-    }
-
-
-    public void delete_table(Connection conn, String table_name){
-        Statement statement;
-        try {
-            String query= String.format("drop table %s",table_name);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Table Deleted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-
-    public void delete_row_by_name(Connection conn,String table_name, String name){
-        Statement statement;
-        try{
-            String query=String.format("delete from %s where name='%s'",table_name,name);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Data Deleted");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    public void search_by_id(Connection conn, String table_name,int id){
-        Statement statement;
-        ResultSet rs=null;
-        try {
-            String query=String.format("select * from %s where empid= %s",table_name,id);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while (rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("address"));
-
-            }
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    public void user_search_by_email(Connection conn,String email){
-        Statement statement;
-        ResultSet rs=null;
-        try {
-            String query=String.format("select * from users where email= %s",email);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while (rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("address"));
-
-            }
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    public void read_data(Connection conn, String table_name){
-        Statement statement;
-        ResultSet rs=null;
-        try {
-            String query=String.format("select * from %s",table_name);
-            statement=conn.createStatement();
-            rs=statement.executeQuery(query);
-            while(rs.next()){
-                System.out.print(rs.getString("empid")+" ");
-                System.out.print(rs.getString("name")+" ");
-                System.out.println(rs.getString("Address")+" ");
-            }
-
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    public void insert_users_row(Connection conn,String surname, String lastname,
-                                 String email, String password, String phone, String address){
-        Statement statement;
-        try {
-            String query=String.format("insert into users (surname, lastname, email, password, phone, address)" +
-                    " values('%s','%s','%s','%s','%s','%s');",surname,lastname, email, password, phone, address);
-            statement=conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
-        }catch (Exception e){
-            System.out.println(e);
         }
     }
 
@@ -581,29 +557,6 @@ public class DbFunctions {
 
 
     }
-    public void createTableUsersGoods(Connection conn, String table_name) {
-        System.out.println("the table_name: "+ table_name);
-        Statement statement;
-        try {
-            DatabaseMetaData metaData = conn.getMetaData();
-            ResultSet resultSet = metaData.getTables(null, null, table_name, null);
-
-            if (!resultSet.next()) {
-                String query = "CREATE TABLE "+ table_name +" (id SERIAL PRIMARY KEY, userId integer,goodsId integer);";
-
-
-                statement = conn.createStatement();
-                statement.executeUpdate(query);
-                System.out.println("Table Created");
-            } else {
-                System.out.println("Table already exists");
-            }
-
-            resultSet.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
 
     public void setGoodStatus(Connection conn, String status, Long goodId) {
         Statement statement;
@@ -616,5 +569,161 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
+    public Connection connect_to_db(String dbname,String user,String pass){
+        Connection conn=null;
+        try{
+            Class.forName("org.postgresql.Driver");
+            conn= DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+dbname,user,"123456");
+            if(conn!=null){
+                System.out.println("Connection Established");
+            }
+            else{
+                System.out.println("Connection Failed");
+            }
 
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        return conn;
+    }
+
+
+    public Integer selectTypeWithName(Connection conn, String typeName) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String query = "SELECT id FROM types WHERE type = ?";
+            preparedStatement = conn.prepareStatement(query);
+            preparedStatement.setString(1, typeName);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            } else {
+                return null; // Type not found
+            }
+        } catch (SQLException e) {
+            // Handle SQLException appropriately (e.g., log or rethrow)
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                // Handle SQLException appropriately (e.g., log or rethrow)
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String selectTypeWithId(Connection conn, Integer type) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String query = "SELECT type FROM types WHERE id = ?";
+            preparedStatement = conn.prepareStatement(query);
+            preparedStatement.setInt(1, type);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("type");
+            } else {
+                return null; // Type not found
+            }
+        } catch (SQLException e) {
+            // Handle SQLException appropriately (e.g., log or rethrow)
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                // Handle SQLException appropriately (e.g., log or rethrow)
+                e.printStackTrace();
+            }
+        }
+    }
+    public void createGoodsUpdateTrigger(Connection conn) {
+        try {
+            // Drop existing trigger if it exists
+            dropTriggerIfExists(conn, "goods_update_trigger");
+
+            String triggerQuery = "CREATE OR REPLACE FUNCTION goods_update_trigger_function()\n" +
+                    "RETURNS TRIGGER AS $$\n" +
+                    "BEGIN\n" +
+                    "  INSERT INTO history (userId, action, time, goodsId)\n" +
+                    "  VALUES (NEW.type_id, 'update', NOW(), NEW.id);\n" +
+                    "  RETURN NEW;\n" +
+                    "END;\n" +
+                    "$$ LANGUAGE plpgsql;\n" +
+                    "CREATE TRIGGER goods_update_trigger\n" +
+                    "AFTER UPDATE ON goods\n" +
+                    "FOR EACH ROW\n" +
+                    "EXECUTE PROCEDURE goods_update_trigger_function();";
+
+            try (PreparedStatement preparedStatement = conn.prepareStatement(triggerQuery)) {
+                preparedStatement.executeUpdate();
+            }
+
+            System.out.println("Update Trigger Created");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void createGoodsDeleteTrigger(Connection conn) {
+        try {
+            // Drop existing trigger if it exists
+            dropTriggerIfExists(conn, "goods_delete_trigger");
+
+            String triggerQuery = "CREATE OR REPLACE FUNCTION goods_delete_trigger_function()\n" +
+                    "RETURNS TRIGGER AS $$\n" +
+                    "BEGIN\n" +
+                    "  INSERT INTO history (userId, action, time, goodsId)\n" +
+                    "  VALUES (OLD.type_id, 'delete', NOW(), OLD.id);\n" +
+                    "  RETURN OLD;\n" +
+                    "END;\n" +
+                    "$$ LANGUAGE plpgsql;\n" +
+                    "CREATE TRIGGER goods_delete_trigger\n" +
+                    "BEFORE DELETE ON goods\n" +
+                    "FOR EACH ROW\n" +
+                    "EXECUTE PROCEDURE goods_delete_trigger_function();";
+
+            try (PreparedStatement preparedStatement = conn.prepareStatement(triggerQuery)) {
+                preparedStatement.executeUpdate();
+            }
+
+            System.out.println("Delete Trigger Created");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void dropTriggerIfExists(Connection conn, String triggerName) {
+        try {
+            String dropQuery = "DROP TRIGGER IF EXISTS " + triggerName + " ON goods;";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(dropQuery)) {
+                preparedStatement.executeUpdate();
+            }
+            System.out.println("Dropped existing trigger: " + triggerName);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 }

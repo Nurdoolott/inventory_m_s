@@ -67,7 +67,7 @@ public class DeleteController {
 
         id.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         description.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
-        type.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
+        type.setCellValueFactory(cellData -> cellData.getValue().typeProperty().asString());
         size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
         name.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         date.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -92,6 +92,7 @@ public class DeleteController {
                     Goods goods = getTableView().getItems().get(getIndex());
                     goods.setStatus("disable");
                     dbFunctions.setGoodStatus(conn, "disable", goods.getId());
+                    dbFunctions.createGoodsDeleteTrigger(conn);
                     deleteGoods(goods);
                 });
             }
@@ -114,16 +115,7 @@ public class DeleteController {
         dbFunctions.delete_row_by_id(conn,"goods", Math.toIntExact(goods.getId()));
         loadPage("delete-view.fxml");
     }
-    public void deleteGoods(Connection conn, Goods goods) {
-        try {
-            String query = String.format("DELETE FROM goods WHERE id = %d;", goods.getId());
-            Statement statement = conn.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Deleted");
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
+
 
 
     public void setLogo_email(String email) {

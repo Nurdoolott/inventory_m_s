@@ -119,7 +119,6 @@ public class RegisterController {
     void initialize() {
         dbFunctions=new DbFunctions();
         conn=dbFunctions.connect_to_db("testdb","postgres","123456");
-
         role.getItems().add(Role.ADMIN.name());
         role.getItems().add(Role.USER.name());
         role.setValue("Roles");

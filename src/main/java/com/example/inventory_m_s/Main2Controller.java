@@ -67,6 +67,7 @@ public class Main2Controller {
 
         dbFunctions.createTableGoods(conn, "goods");
         dbFunctions.createTableType(conn, "types");
+        dbFunctions.createTableUsersGoods(conn, "usersgoods");
         if(dbFunctions.read_data_type(conn, "types") == 0){
             for (Type type: Type.values())
                 dbFunctions.insert_into_types(conn, type.name());

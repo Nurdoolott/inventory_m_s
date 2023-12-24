@@ -68,8 +68,9 @@ public class GoodsController {
     void initialize() {
         dbFunctions=new DbFunctions();
         conn=dbFunctions.connect_to_db("testdb","postgres","123456");
-        dbFunctions.createTableGoods(conn, "goods");
         dbFunctions.createTableType(conn, "types");
+
+        dbFunctions.createTableGoods(conn, "goods");
         if(dbFunctions.read_data_type(conn, "types") == 0){
             for (Type type: Type.values())
                 dbFunctions.insert_into_types(conn, type.name());

@@ -27,7 +27,7 @@ public class UpdateController {
         name.setText(goods.getName());
         description.setText(goods.getDescription());
         date.setText(LocalDateTime.now().toString());
-        variableComboBox.setValue(goods.getType());
+        variableComboBox.setValue(dbFunctions.selectTypeWithId(conn, goods.getType()));
     }
     private DbFunctions dbFunctions;
     private Connection conn;
@@ -76,13 +76,14 @@ public class UpdateController {
         String type = variableComboBox.getValue();
 
         Goods goods = new Goods();
-        goods.setType(type);
+        goods.setType(dbFunctions.selectTypeWithName(conn, type));
         goods.setDate(date.getText());
         goods.setName(name.getText());
         goods.setPrize(Integer.parseInt(prize.getText()));
         goods.setDescription(description.getText());
         goods.setId(this.goods.getId());
         dbFunctions.updateGoods(conn, goods);
+        dbFunctions.createGoodsUpdateTrigger(conn);
         statusAdding.setText("added successfully!");
 
     }
