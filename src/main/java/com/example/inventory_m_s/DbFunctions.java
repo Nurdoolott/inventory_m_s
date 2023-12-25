@@ -46,33 +46,6 @@ public class DbFunctions {
         return generatedId;
     }
 
-    public void createGoodsInsertTrigger(Connection conn, Long userId, Long goodId) {
-        try {
-            String triggerQuery = "CREATE OR REPLACE FUNCTION goods_insert_trigger_function()\n" +
-                    "RETURNS TRIGGER AS $$\n" +
-                    "BEGIN\n" +
-                    "  INSERT INTO history (userid, action, time, goodsid)\n" +
-                    "  VALUES (" + Math.toIntExact(userId) + ", 'add', NOW(), " + Math.toIntExact(goodId) + ");\n" +
-                    "  RETURN NEW;\n" +
-                    "END;\n" +
-                    "$$ LANGUAGE plpgsql;\n" +
-                    "CREATE TRIGGER goods_insert_trigger\n" +
-                    "AFTER INSERT ON goods\n" +
-                    "FOR EACH ROW\n" +
-                    "EXECUTE PROCEDURE goods_insert_trigger_function();";
-
-            try (Statement statement = conn.createStatement()) {
-                System.out.println("w1");
-                statement.executeUpdate(triggerQuery);
-                System.out.println("w2");
-            }
-
-            System.out.println("Trigger Created");
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
 
 
     public void createTableHistory(Connection conn){
@@ -657,6 +630,34 @@ public class DbFunctions {
             }
         }
     }
+    public void createGoodsInsertTrigger(Connection conn, Long userId, Long goodId) {
+        try {
+            String triggerQuery = "CREATE OR REPLACE FUNCTION goods_insert_trigger_function()\n" +
+                    "RETURNS TRIGGER AS $$\n" +
+                    "BEGIN\n" +
+                    "  INSERT INTO history (userid, action, time, goodsid)\n" +
+                    "  VALUES (" + Math.toIntExact(userId) + ", 'add', NOW(), " + Math.toIntExact(goodId) + ");\n" +
+                    "  RETURN NEW;\n" +
+                    "END;\n" +
+                    "$$ LANGUAGE plpgsql;\n" +
+                    "CREATE TRIGGER goods_insert_trigger\n" +
+                    "AFTER INSERT ON goods\n" +
+                    "FOR EACH ROW\n" +
+                    "EXECUTE PROCEDURE goods_insert_trigger_function();";
+
+            try (Statement statement = conn.createStatement()) {
+                System.out.println("w1");
+                statement.executeUpdate(triggerQuery);
+                System.out.println("w2");
+            }
+
+            System.out.println("Trigger Created");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     public void createGoodsUpdateTrigger(Connection conn) {
         try {
             // Drop existing trigger if it exists

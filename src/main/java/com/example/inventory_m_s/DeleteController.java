@@ -113,6 +113,8 @@ public class DeleteController {
         // Implement your delete logic here
         System.out.println("Deleting goods with id: " + goods.getId());
         dbFunctions.delete_row_by_id(conn,"goods", Math.toIntExact(goods.getId()));
+        dbFunctions.createGoodsDeleteTrigger(conn);
+
         loadPage("delete-view.fxml");
     }
 
